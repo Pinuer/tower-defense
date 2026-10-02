@@ -18,7 +18,8 @@ function pos(d){
 const TYPES={
   arrow:{name:'Flecha',cost:50,range:120,rate:.5,dmg:12,col:'#e0b84f'},
   cannon:{name:'Cañón',cost:100,range:100,rate:1.3,dmg:30,splash:45,col:'#d9674f'},
-  frost:{name:'Hielo',cost:75,range:100,rate:.9,dmg:4,slow:1,col:'#7cc4e0'}
+  frost:{name:'Hielo',cost:75,range:100,rate:.9,dmg:4,slow:1,col:'#7cc4e0'},
+  fire:{name:'Fuego',cost:120,range:85,rate:.12,dmg:3,burn:1,col:'#ff8a2b'}
 };
 const KINDS={normal:{sp:50,hp:1,col:'#cfd8c8',r:9},fast:{sp:90,hp:.6,col:'#e8e07a',r:7},tank:{sp:32,hp:3.5,col:'#a07cc4',r:12}};
 let S;
@@ -86,9 +87,10 @@ C.addEventListener('click',e=>{
   S.towers.push({k:S.pick,cx,cy,x:cx*T+T/2,y:cy*T+T/2,range:d.range,dmg:d.dmg,cd:0,lv:1,spent:d.cost});
   $('info').textContent='';ui();
 });
-function hit(e,dmg,slow){
+function hit(e,dmg,slow,burn){
   if(e.dead)return;
   e.hp-=dmg;if(slow)e.slow=1.5;
+  if(burn){e.burn=2;e.bd=Math.max(e.bd||0,dmg*1.5)}
   if(e.hp<=0){e.dead=true;S.gold+=e.rw;ui()}
 }
 function update(dt){
@@ -103,6 +105,7 @@ function update(dt){
   }
   for(const e of S.enemies){
     e.slow=Math.max(0,e.slow-dt);
+    if(e.burn>0){e.burn-=dt;hit(e,e.bd*dt)}
     e.d+=e.sp*(e.slow>0?.5:1)*dt;
     if(e.d>=total&&!e.dead){e.dead=true;S.lives--;ui();if(S.lives<=0){S.over='lose'}}
   }
@@ -122,7 +125,7 @@ function update(dt){
     if(dist<=step){
       const d=TYPES[s.t.k];
       if(d.splash){for(const e of S.enemies){const q=pos(e.d);if(Math.hypot(q[0]-p[0],q[1]-p[1])<=d.splash)hit(e,s.t.dmg)}}
-      else hit(s.tg,s.t.dmg,d.slow);
+      else hit(s.tg,s.t.dmg,d.slow,d.burn);
       s.gone=true;
     }else{s.a=Math.atan2(dy,dx);s.x+=dx/dist*step;s.y+=dy/dist*step}
   }
@@ -190,6 +193,13 @@ function drawTower(t,t0){
     X.fillStyle='#4a4b52';X.fillRect(16,-6.5,5,13);
     X.fillStyle='#34353b';X.beginPath();X.arc(0,0,9,0,7);X.fill();
     X.fillStyle='#d9674f';X.beginPath();X.arc(0,0,4,0,7);X.fill();
+  }else if(t.k==='fire'){
+    X.rotate(t.ang||0);
+    X.fillStyle='#3a2a22';X.fillRect(0,-4,16,8);
+    X.fillStyle='#7a3a1c';X.fillRect(14,-5.5,5,11);
+    X.fillStyle='#b5432a';X.beginPath();X.arc(-4,0,8,0,7);X.fill();
+    X.fillStyle='#d9674f';X.beginPath();X.arc(-6,-2,3,0,7);X.fill();
+    X.fillStyle='#ffb347';X.beginPath();X.arc(21,0,2.5+Math.sin(t0*20)*.8,0,7);X.fill();
   }else{
     X.fillStyle='rgba(124,196,224,.25)';X.beginPath();X.arc(0,0,18,0,7);X.fill();
     X.rotate(t0*.8);
@@ -221,7 +231,7 @@ function draw(){
   for(const e of S.enemies){
     const p=pos(e.d);
     X.fillStyle='rgba(0,0,0,.25)';X.beginPath();X.ellipse(p[0],p[1]+e.r*.7,e.r,e.r*.45,0,0,7);X.fill();
-    X.fillStyle=e.slow>0?'#7cc4e0':e.col;X.strokeStyle='#10191a';X.lineWidth=2;
+    X.fillStyle=e.slow>0?'#7cc4e0':e.burn>0?'#ff9a4a':e.col;X.strokeStyle='#10191a';X.lineWidth=2;
     X.beginPath();X.arc(p[0],p[1],e.r,0,7);X.fill();X.stroke();
     X.fillStyle='#000';X.fillRect(p[0]-12,p[1]-e.r-8,24,4);
     X.fillStyle='#6fcf7a';X.fillRect(p[0]-12,p[1]-e.r-8,24*Math.max(0,e.hp/e.max),4);
@@ -234,6 +244,9 @@ function draw(){
     }else if(k==='cannon'){
       X.fillStyle='#1f2024';X.beginPath();X.arc(s.x,s.y,4.5,0,7);X.fill();
       X.fillStyle='#6a6b73';X.beginPath();X.arc(s.x-1,s.y-1,1.5,0,7);X.fill();
+    }else if(k==='fire'){
+      X.fillStyle='rgba(255,110,30,.45)';X.beginPath();X.arc(s.x,s.y,7,0,7);X.fill();
+      X.fillStyle='#ffd24a';X.beginPath();X.arc(s.x,s.y,3.5,0,7);X.fill();
     }else{
       X.fillStyle='rgba(124,196,224,.35)';X.beginPath();X.arc(s.x,s.y,7,0,7);X.fill();
       X.fillStyle='#d8f4ff';X.beginPath();X.arc(s.x,s.y,3.5,0,7);X.fill();

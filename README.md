@@ -16,6 +16,7 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 | Flecha | 50    | Disparo rápido, daño bajo   |
 | Cañón  | 100   | Daño en área, disparo lento |
 | Hielo  | 75    | Ralentiza a los enemigos    |
+| Fuego  | 120   | Alcance corto, daño y quema |
 
 ## Ejecutar en local
 
@@ -25,6 +26,16 @@ Abre `index.html` en el navegador, o levanta un servidor desde la carpeta del pr
 npx serve
 ```
 
+## Estructura
+
+```
+tower-defense/
+├── index.html
+├── css/
+│   └── style.css
+└── js/
+    └── game.js
+```
 
 ## Personalizar
 
