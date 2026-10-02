@@ -1,17 +1,15 @@
 # Tower Defense
 
-Juego de torres sin dependencias: `index.html`, `style.css` y `game.js`. HTML + Canvas + JavaScript.
+Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 
-## Jugar
-
-Abre `index.html` en el navegador, o publícalo con GitHub Pages:
-**Settings → Pages → Deploy from a branch → `main` / root**.
+**[Jugar online](https://pinuer.github.io/tower-defense/)**
 
 ## Cómo se juega
 
 - Elige una torre y haz clic en un tile verde para colocarla.
 - Haz clic en una torre ya colocada para mejorarla (hasta nivel 3) o venderla.
 - Pulsa **Iniciar oleada**. Sobrevive 20 oleadas sin quedarte sin vidas.
+- El botón de velocidad alterna entre x1, x2 y x3.
 
 | Torre  | Costo | Efecto                      |
 |--------|-------|-----------------------------|
@@ -19,9 +17,18 @@ Abre `index.html` en el navegador, o publícalo con GitHub Pages:
 | Cañón  | 100   | Daño en área, disparo lento |
 | Hielo  | 75    | Ralentiza a los enemigos    |
 
+## Ejecutar en local
+
+Abre `index.html` en el navegador, o levanta un servidor desde la carpeta del proyecto:
+
+```bash
+npx serve
+```
+
+
 ## Personalizar
 
-Todo el balance está al inicio del script: `TYPES` (torres), `KINDS` (enemigos), `WP` (ruta) y `MAXW` (oleadas).
+Todo el balance está al inicio de `js/game.js`: `TYPES` (torres), `KINDS` (enemigos), `WP` (ruta) y `MAXW` (oleadas).
 
 ## Licencia
 
