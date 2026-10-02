@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower Defense</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+<h1>Tower Defense</h1>
+<div class="bar"><span>Oro <b id="gold"></b></span><span>Vidas <b id="lives"></b></span><span>Oleada <b id="wave"></b>/20</span></div>
+<canvas id="c" width="640" height="480"></canvas>
+<div class="row" id="shop"></div>
+<div class="row">
+  <button class="go" id="start">Iniciar oleada</button>
+  <button id="speed">Velocidad x1</button>
+  <button id="restart">Reiniciar</button>
+</div>
+<div class="row" id="sel" hidden>
+  <button id="up"></button><button id="sell"></button>
+</div>
+<div id="info">Elige una torre y haz clic en un tile verde para colocarla.</div>
+</main>
+<script src="js/game.js"></script>
+</body>
+</html>
