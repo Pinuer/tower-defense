@@ -5,7 +5,7 @@ main{width:100%;max-width:640px}
 h1{font-size:22px;margin:0 0 10px;font-weight:600;letter-spacing:.02em}
 .bar{display:flex;gap:18px;margin-bottom:8px;color:var(--mute)}
 .bar b{color:var(--ink);font-weight:600}
-canvas{width:100%;height:auto;display:block;background:#233a30;border:1px solid var(--line);border-radius:4px;touch-action:manipulation}
+canvas{width:100%;height:auto;display:block;background:#4f7c3a;border:1px solid var(--line);border-radius:4px;touch-action:manipulation}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 button{font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:7px 11px;cursor:pointer}
 button:hover:not(:disabled){border-color:var(--accent)}
