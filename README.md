@@ -9,6 +9,7 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 - Elige una torre y haz clic en un tile verde para colocarla.
 - Haz clic en una torre ya colocada para mejorarla (hasta nivel 3) o venderla.
 - Pulsa **Iniciar oleada**. Sobrevive 20 oleadas sin quedarte sin vidas.
+- Son 4 niveles (Valle, Nieve, Desierto y Volcán). Al superar uno se desbloquea el siguiente; el progreso se guarda en el navegador.
 - El botón de velocidad alterna entre x1, x2 y x3.
 
 | Torre  | Costo | Efecto                      |
@@ -34,13 +35,10 @@ tower-defense/
 ├── css/
 │   └── style.css
 └── js/
+    ├── maps.js
     └── game.js
 ```
 
 ## Personalizar
 
-Todo el balance está al inicio de `js/game.js`: `TYPES` (torres), `KINDS` (enemigos), `WP` (ruta) y `MAXW` (oleadas).
-
-## Licencia
-
-MIT
+Los mapas (ruta, colores, oro inicial y dificultad de cada nivel) están en `js/maps.js`. El resto del balance está al inicio de `js/game.js`: `TYPES` (torres), `KINDS` (enemigos) y `MAXW` (oleadas).

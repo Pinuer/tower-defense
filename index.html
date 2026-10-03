@@ -10,9 +10,9 @@
 <main>
 <h1>Tower Defense</h1>
 <div class="bar">
-  <span class="chip" title="Oro">🪙 <b id="gold"></b></span>
-  <span class="chip" title="Vidas">❤️ <b id="lives"></b></span>
-  <span class="chip" title="Oleada">🌊 Oleada <b id="wave"></b>/20</span>
+  <span class="chip" title="Oro">Oro <b id="gold"></b></span>
+  <span class="chip" title="Vidas">Vidas <b id="lives"></b></span>
+  <span class="chip" title="Oleada">Oleada <b id="wave"></b>/20</span>
 </div>
 <div class="game">
   <canvas id="c" width="640" height="480"></canvas>
@@ -22,14 +22,16 @@
       <button class="go" id="start">Iniciar oleada</button>
       <button id="speed">Velocidad x1</button>
       <button id="restart">Reiniciar</button>
+      <button id="mapbtn"></button>
     </div>
     <div class="row" id="sel" hidden>
       <button id="up"></button><button id="sell"></button>
     </div>
-    <div id="info">Elige una torre y haz clic en un tile verde para colocarla.</div>
+    <div id="info">Elige una torre y haz clic en un casillero libre para colocarla.</div>
   </aside>
 </div>
 </main>
+<script src="js/maps.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>
