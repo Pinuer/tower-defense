@@ -139,3 +139,154 @@ button.go{
 }
 
 [hidden]{display:none !important}
+
+/* Mejoras visuales */
+
+main{
+    animation:fade .6s ease both
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(8px)
+    }
+    to{
+        opacity:1;
+        transform:none
+    }
+}
+
+@keyframes pulse{
+    0%,100%{
+        box-shadow:0 3px 0 #8a6d22,0 0 0 0 rgba(224,184,79,.45)
+    }
+    50%{
+        box-shadow:0 3px 0 #8a6d22,0 0 0 8px rgba(224,184,79,0)
+    }
+}
+
+h1{
+    letter-spacing:.14em
+}
+
+h1::before,
+h1::after{
+    content:"⚔";
+    font-size:.5em;
+    margin:0 .7em;
+    vertical-align:.25em;
+    opacity:.75
+}
+
+.chip{
+    font-size:16px;
+    background:linear-gradient(#24393a,var(--panel));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.35)
+}
+
+canvas{
+    box-shadow:0 0 0 1px #2e2112,0 0 0 9px rgba(107,76,46,.22),0 18px 44px rgba(0,0,0,.6)
+}
+
+.row{
+    padding:10px;
+    background:rgba(26,40,41,.55);
+    border:1px solid var(--line);
+    border-radius:12px
+}
+
+button:active:not(:disabled){
+    transform:translateY(1px)
+}
+
+button.go:not(:disabled){
+    animation:pulse 2s infinite
+}
+
+#info{
+    background:rgba(26,40,41,.5);
+    border-radius:999px;
+    padding:4px 14px
+}
+
+#info:empty{
+    background:none
+}
+
+
+/*Panel lateral */
+
+main{
+    max-width:960px
+}
+
+.game{
+    display:flex;
+    gap:18px;
+    align-items:flex-start
+}
+
+.game canvas{
+    flex:1 1 0;
+    min-width:0
+}
+
+.side{
+    flex:0 0 250px;
+    display:flex;
+    flex-direction:column;
+    gap:12px
+}
+
+.side .row{
+    margin-top:0
+}
+
+#shop{
+    flex-direction:column
+}
+
+#shop button{
+    width:100%;
+    text-align:left
+}
+
+.side .go{
+    flex:1 1 100%
+}
+
+#speed,
+#restart,
+#up,
+#sell{
+    flex:1
+}
+
+.side #info{
+    margin-top:0
+}
+
+@media (max-width:900px){
+    .game{
+        flex-direction:column
+    }
+
+    .game canvas{
+        flex:none;
+        width:100%
+    }
+
+    .side{
+        flex:none;
+        width:100%
+    }
+
+    #shop{
+        flex-direction:row
+    }
+
+    #shop button{
+        width:auto
+    }
+}
