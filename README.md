@@ -18,6 +18,7 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 | Cañón  | 100   | Daño en área, disparo lento |
 | Hielo  | 75    | Ralentiza a los enemigos    |
 | Fuego  | 120   | Alcance corto, daño y quema |
+| Rayo   | 150   | Desde el nivel 2: rayo en cadena entre enemigos |
 
 ## Ejecutar en local
 

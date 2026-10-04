@@ -29,12 +29,13 @@ const TYPES={
   arrow:{name:'Flecha',cost:50,range:120,rate:.5,dmg:12,col:'#e0b84f'},
   cannon:{name:'Cañón',cost:100,range:100,rate:1.3,dmg:30,splash:45,col:'#d9674f'},
   frost:{name:'Hielo',cost:75,range:100,rate:.9,dmg:4,slow:1,col:'#7cc4e0'},
-  fire:{name:'Fuego',cost:120,range:85,rate:.12,dmg:3,burn:1,col:'#ff8a2b'}
+  fire:{name:'Fuego',cost:120,range:85,rate:.12,dmg:3,burn:1,col:'#ff8a2b'},
+  bolt:{name:'Rayo',cost:150,range:110,rate:1.1,dmg:14,chain:3,col:'#b48cf0',lvl:2}
 };
 const KINDS={normal:{sp:50,hp:1,col:'#cfd8c8',r:9},fast:{sp:90,hp:.6,col:'#e8e07a',r:7},tank:{sp:32,hp:3.5,col:'#a07cc4',r:12}};
 let S;
 function reset(){
-  S={fx:[],pt:[],cd:WAIT,gold:MAPS[MI].gold,lives:20,wave:0,towers:[],enemies:[],shots:[],queue:[],spawnT:0,active:false,over:null,speed:1,bt:9,hurt:0,pick:'arrow',sel:null,mx:-1,my:-1};
+  S={fx:[],pt:[],cd:WAIT,gold:MAPS[MI].gold,lives:20,wave:0,towers:[],enemies:[],shots:[],queue:[],spawnT:0,active:false,over:null,speed:1,bt:9,hurt:0,arcs:[],pick:'arrow',sel:null,mx:-1,my:-1};
   $('speed').textContent='Velocidad x1';$('mapbtn').textContent='Nivel '+(MI+1)+': '+MAPS[MI].name;
   ui();
 }
@@ -43,7 +44,11 @@ function ui(){
   $('gold').textContent=S.gold;$('lives').textContent=S.lives;$('wave').textContent=S.wave;
   $('start').disabled=S.active||!!S.over;
   $('mapbtn').textContent=S.over==='win'&&MI+1<MAPS.length?'Siguiente nivel →':'Nivel '+(MI+1)+': '+MAPS[MI].name;
-  document.querySelectorAll('#shop button').forEach(b=>{b.classList.toggle('sel',b.dataset.k===S.pick);b.classList.toggle('poor',S.gold<TYPES[b.dataset.k].cost)});
+  document.querySelectorAll('#shop button').forEach(b=>{
+    const d=TYPES[b.dataset.k],lock=(d.lvl||1)>MI+1;
+    b.classList.toggle('sel',b.dataset.k===S.pick);b.classList.toggle('poor',S.gold<d.cost);
+    b.disabled=lock;b.textContent=d.name+(lock?' (Nivel '+d.lvl+')':' ('+d.cost+')');
+  });
   const t=S.sel;$('sel').hidden=!t;
   if(t){
     const maxed=t.lv>=3;
@@ -73,7 +78,8 @@ $('start').onclick=startWave;
 $('mapbtn').onclick=()=>{
   const n=S.over==='win'&&MI+1<MAPS.length?MI+1:(MI+1)%unlocked;
   setMap(n);drawMap();reset();
-  $('info').textContent='Nivel '+(MI+1)+': '+MAPS[MI].name+(unlocked<MAPS.length?'. Supera este nivel para desbloquear el siguiente.':'.');
+  const nt=Object.values(TYPES).find(d=>d.lvl===MI+1);
+  $('info').textContent='Nivel '+(MI+1)+': '+MAPS[MI].name+'.'+(nt?' Torre nueva: '+nt.name+'.':'');
 };
 $('speed').onclick=()=>{S.speed=S.speed%3+1;$('speed').textContent='Velocidad x'+S.speed};
 $('restart').onclick=()=>{reset();$('info').textContent='Partida nueva.'};
@@ -115,10 +121,26 @@ function hit(e,dmg,slow,burn){
     ui();
   }
 }
+function chain(t,first){
+  const d=TYPES[t.k],pts=[[t.x,t.y]],done=new Set(),n=d.chain+t.lv-1;
+  let cur=first,dmg=t.dmg;
+  for(let i=0;i<n&&cur;i++){
+    const p=pos(cur.d);done.add(cur);pts.push(p);hit(cur,dmg);dmg*=.75;
+    let nxt=null,nd=75;
+    for(const e of S.enemies){
+      if(e.dead||done.has(e))continue;
+      const q=pos(e.d),dd=Math.hypot(q[0]-p[0],q[1]-p[1]);
+      if(dd<nd){nd=dd;nxt=e}
+    }
+    cur=nxt;
+  }
+  S.arcs.push({pts,t:0,j:pts.map(()=>(Math.random()-.5)*14)});
+}
 function update(dt){
   for(const f of S.fx){f.t+=dt;f.y-=24*dt}
   for(const q of S.pt){q.t+=dt;q.x+=q.vx*dt;q.y+=q.vy*dt}
   S.fx=S.fx.filter(f=>f.t<.9);S.pt=S.pt.filter(q=>q.t<.4);
+  S.arcs.forEach(a=>a.t+=dt);S.arcs=S.arcs.filter(a=>a.t<.18);
   S.bt+=dt;S.hurt=Math.max(0,S.hurt-dt);
   if(S.over)return;
   if(!S.active){S.cd-=dt;if(S.cd<=0)startWave()}
@@ -144,7 +166,7 @@ function update(dt){
       const p=pos(e.d);
       if(Math.hypot(p[0]-t.x,p[1]-t.y)<=t.range&&(!best||e.d>best.d))best=e;
     }
-    if(best){const q=pos(best.d);t.ang=Math.atan2(q[1]-t.y,q[0]-t.x);t.cd=TYPES[t.k].rate;S.shots.push({x:t.x,y:t.y,tg:best,t,a:t.ang});}
+    if(best){const q=pos(best.d);t.ang=Math.atan2(q[1]-t.y,q[0]-t.x);t.cd=TYPES[t.k].rate;if(TYPES[t.k].chain)chain(t,best);else S.shots.push({x:t.x,y:t.y,tg:best,t,a:t.ang});}
   }
   for(const s of S.shots){
     if(s.tg.dead){s.gone=true;continue}
@@ -203,6 +225,14 @@ function drawTower(t,t0){
     for(const[a,b]of[[11,-2],[-15,-2],[-2,11],[-2,-15]])rect(a,b,4,4,c);
     X.restore();
   }
+  if(t.k==='bolt'){
+    X.save();X.rotate(t0*.8);X.lineWidth=1.5;
+    for(const[a,b]of[[9,-2],[-13,-2],[-2,9],[-2,-13]])rect(a,b,4,4,'#6a5a8a');
+    X.restore();
+    X.fillStyle=c;X.beginPath();X.arc(0,0,9,0,7);X.fill();X.stroke();
+    X.fillStyle='#7a5fb0';X.beginPath();X.arc(0,0,5.5,0,7);X.fill();X.stroke();
+    X.fillStyle=rec>.6?'#ffffff':'#e9dcff';X.beginPath();X.arc(0,0,2.8,0,7);X.fill();
+  }
   X.lineWidth=1;
   for(let i=0;i<t.lv;i++)rect(-10+i*7,10,5,4,'#f4efe0');
   X.restore();
@@ -251,6 +281,17 @@ function draw(){
   for(const s of S.shots){
     X.fillStyle=TYPES[s.t.k].col;X.strokeStyle=OUT;X.lineWidth=1.5;
     X.fillRect(s.x-3,s.y-3,6,6);X.strokeRect(s.x-3,s.y-3,6,6);
+  }
+  for(const a of S.arcs){
+    for(const w of[[OUT,5],['#e9dcff',2.5]]){
+      X.strokeStyle=w[0];X.lineWidth=w[1];X.lineJoin='round';X.beginPath();
+      a.pts.forEach((p,i)=>{
+        if(!i){X.moveTo(p[0],p[1]);return}
+        const o=a.pts[i-1],j=a.j[i];
+        X.lineTo((o[0]+p[0])/2+j,(o[1]+p[1])/2-j);X.lineTo(p[0],p[1]);
+      });
+      X.stroke();
+    }
   }
   for(const q of S.pt){X.globalAlpha=1-q.t/.4;X.fillStyle=q.c;X.beginPath();X.arc(q.x,q.y,3,0,7);X.fill()}
   X.font='bold 14px sans-serif';X.textAlign='center';X.lineWidth=3;X.strokeStyle='#10191a';
