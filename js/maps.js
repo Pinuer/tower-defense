@@ -1,22 +1,27 @@
 /* Mapas: ruta (wp), oro inicial, vida de enemigos (hpm) y colores de cada nivel.
    Se carga antes que game.js. */
 const MAPS=[
-  {name:'Valle',gold:120,hpm:1,wp:[[0,2],[11,2],[11,5],[3,5],[3,9],[15,9]],
+  {name:'Valle',foe:'healer',boss:{name:'Caudillo',ab:'summon',col:'#6f8f4a'},gold:120,hpm:1,wp:[[0,2],[11,2],[11,5],[3,5],[3,9],[15,9]],
    gr:['#55843f','#4f7c3a','#5a8a43','#4b7536'],bl:['#3f6a2f','#6a9b50'],pl:'150,200,90',pd:'25,60,25',
    fl:['#f2e6a0','#f4f4f0','#e89aa8','#b9a5e8'],bu:['#3f6f33','#477a39','#5a9447'],rk:['#8a8d88','#b4b7b0'],
    tr:['#2f5f2b','#33672e','#3d7a35','#4f9142'],pc:['#6b4c2e','#b99560','#c9a96b','#d6bc82']},
-  {name:'Nieve',gold:140,hpm:1.1,wp:[[0,1],[13,1],[13,4],[2,4],[2,7],[13,7],[13,10],[15,10]],
+  {name:'Nieve',foe:'yeti',boss:{name:'Gigante de escarcha',ab:'freeze',col:'#bcd9e8',noSlow:1},gold:140,hpm:1.1,wp:[[0,1],[13,1],[13,4],[2,4],[2,7],[13,7],[13,10],[15,10]],
    gr:['#dfe9ee','#d5e2e9','#e9f1f5','#cddce5'],bl:['#9db4c2','#f4fafc'],pl:'255,255,255',pd:'90,120,150',
    fl:['#bfe3f5','#ffffff','#a9c8f0','#d8eefc'],bu:['#5f8a82','#6b9a90','#7fb0a4'],rk:['#7c8590','#aab3bd'],
    tr:['#27524a','#2d5f55','#36705f','#4a8a75'],pc:['#5d5147','#9a8a78','#b09f8b','#c4b4a0']},
-  {name:'Desierto',gold:150,hpm:1.15,wp:[[0,5],[4,5],[4,1],[8,1],[8,9],[12,9],[12,3],[15,3]],
+  {name:'Desierto',foe:'scorpion',boss:{name:'Escorpión rey',ab:'dash',col:'#b8662f',noBurn:1},gold:150,hpm:1.15,wp:[[0,5],[4,5],[4,1],[8,1],[8,9],[12,9],[12,3],[15,3]],
    gr:['#d9bf7e','#d2b672','#e0c78a','#cbae68'],bl:['#b3924d','#ecd79a'],pl:'255,230,150',pd:'120,80,30',
    fl:['#e8734a','#f2c14e','#d9674f','#f4e4b0'],bu:['#6b7a3a','#7a8a45','#8a9a52'],rk:['#a08060','#c4a47e'],
    tr:['#4f6b2f','#587a35','#668a3c','#789c48'],pc:['#6a4a2a','#a8794a','#b98a56','#c99a66']},
-  {name:'Volcán',gold:160,hpm:1.2,wp:[[0,10],[5,10],[5,6],[10,6],[10,10],[12,10],[12,2],[15,2]],
+  {name:'Volcán',foe:'magma',boss:{name:'Titán de magma',ab:'rage',col:'#c43a1e'},gold:160,hpm:1.2,wp:[[0,10],[5,10],[5,6],[10,6],[10,10],[12,10],[12,2],[15,2]],
    gr:['#3a3433','#342e2d','#403938','#2f2928'],bl:['#5a4a46','#8a5a3a'],pl:'255,110,40',pd:'10,5,5',
    fl:['#ff8a2b','#ffd24a','#e8532a','#ffb347'],bu:['#4a3a30','#5a4638','#6a5240'],rk:['#2c2a2e','#4a474d'],
-   tr:['#2a2220','#33292a','#3d3030','#4a3a38'],pc:['#1d1412','#7a2a14','#c4501e','#ff8a2b']}
+   tr:['#2a2220','#33292a','#3d3030','#4a3a38'],pc:['#1d1412','#7a2a14','#c4501e','#ff8a2b']},
+  {name:'Pantano',foe:'cieno',boss:{name:'Rey del pantano',ab:'regen',col:'#4f7a3a',noPoison:1},gold:170,hpm:1.25,
+   routes:[[[0,5],[3,5],[3,1],[12,1],[12,5],[15,5]],[[0,5],[3,5],[3,10],[12,10],[12,5],[15,5]]],
+   gr:['#4d6b3c','#456236','#557542','#3f5a31'],bl:['#2f4a28','#7fa05a'],pl:'110,150,70',pd:'20,40,25',
+   fl:['#e8d36a','#c8e07a','#f0f0e0','#8fd0c0'],bu:['#3a5a30','#456c38','#5a8446'],rk:['#4a5248','#6a7266'],
+   tr:['#2a4a2a','#315a30','#3a6a38','#4a8244'],pc:['#3b2c1e','#5a432c','#7a5c3c','#8c6d49']}
 ];
 
 /* Dibuja el mapa actual en el canvas MAP (definido en game.js) */

@@ -145,6 +145,7 @@ button.go{
 #shop button.poor{color:var(--mute)}
 
 #speed,
+#pause,
 #restart,
 #mapbtn,
 #up,
@@ -155,6 +156,11 @@ button.go{
 #info{
     color:var(--mute);
     min-height:22px
+}
+
+.hint{
+    color:var(--mute);
+    font-size:13px
 }
 
 [hidden]{display:none !important}
