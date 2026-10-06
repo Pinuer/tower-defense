@@ -23,6 +23,10 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 | Veneno | 110   | Desde el nivel 3: veneno que se acumula y daña con el tiempo |
 | Mortero| 180   | Desde el nivel 4: largo alcance, daño en área, muy lento |
 
+## Mejoras
+
+Todas las torres suben hasta nivel 3. Al pasar del nivel 2 al 3 se elige entre dos caminos de mejora, por ejemplo la Flecha puede ser **Francotirador** (más daño y alcance, dispara más lento) o **Ráfaga** (dispara mucho más rápido). Al pasar el cursor por cada botón se ve qué cambia.
+
 ## Enemigos por nivel
 
 Además de los básicos (soldado, rápido y acorazado), cada nivel suma un enemigo propio desde la oleada 3:
