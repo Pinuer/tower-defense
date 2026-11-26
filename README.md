@@ -6,10 +6,12 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 
 ## Cómo se juega
 
-- Elige una torre y haz clic en un tile verde para colocarla.
+- Elige una torre y haz clic en un tile verde para colocarla. En pantallas táctiles, el primer toque muestra el alcance y el segundo construye.
 - Haz clic en una torre ya colocada para mejorarla (hasta nivel 3) o venderla.
-- Pulsa **Iniciar oleada**. Sobrevive 20 oleadas sin quedarte sin vidas.
+- Pulsa **Iniciar oleada**; si no lo haces, la siguiente oleada empieza sola a los 20 segundos (el botón muestra la cuenta regresiva). Sobrevive 20 oleadas sin quedarte sin vidas.
 - Son 5 niveles (Valle, Nieve, Desierto, Volcán y Pantano). El Pantano tiene dos caminos que se bifurcan: los enemigos se reparten entre ambos y hay que defender los dos. Al superar uno se desbloquea el siguiente; el progreso se guarda en el navegador.
+- Mientras el juego está en pausa no se puede construir, mejorar ni vender.
+- El botón de nivel pide confirmación si hay una partida en curso.
 - El botón de velocidad alterna entre x1, x2 y x3.
 - Atajos de teclado: **Espacio** inicia la oleada, **los números** eligen la torre y **P** pausa o reanuda.
 
@@ -67,10 +69,12 @@ tower-defense/
 ├── css/
 │   └── style.css
 └── js/
-    ├── maps.js
-    └── game.js
+    ├── maps.js    (mapas y dibujo del terreno)
+    ├── data.js    (torres y enemigos: balance)
+    ├── render.js  (dibujo de torres, enemigos y escena)
+    └── game.js    (lógica y entrada del usuario)
 ```
 
 ## Personalizar
 
-Los mapas (ruta, colores, oro inicial y dificultad de cada nivel) están en `js/maps.js`. El resto del balance está al inicio de `js/game.js`: `TYPES` (torres), `KINDS` (enemigos) y `MAXW` (oleadas).
+Los mapas (ruta, colores, oro inicial y dificultad de cada nivel) están en `js/maps.js`. El balance está en `js/data.js` (`TYPES` para torres y `KINDS` para enemigos) y `MAXW` (oleadas) al inicio de `js/game.js`.
