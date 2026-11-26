@@ -25,6 +25,10 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 | Veneno | 110   | Desde el nivel 3: veneno que se acumula y daña con el tiempo |
 | Mortero| 180   | Desde el nivel 4: largo alcance, daño en área, muy lento |
 
+## Sonido
+
+La música y los efectos se generan con la Web Audio API (sin archivos de audio). Cada nivel tiene su propio tema; entre oleadas suena solo melodía y bajo, y al empezar una oleada entra la percusión (más rápida en la del jefe). El botón **Sonido** o la tecla **M** silencian todo y la preferencia se guarda en el navegador. El audio arranca al pulsar *Jugar*, porque los navegadores no permiten sonido antes de una interacción.
+
 ## Mejoras
 
 Todas las torres suben hasta nivel 3. Al pasar del nivel 2 al 3 se elige entre dos caminos de mejora, por ejemplo la Flecha puede ser **Francotirador** (más daño y alcance, dispara más lento) o **Ráfaga** (dispara mucho más rápido). Al pasar el cursor por cada botón se ve qué cambia.
@@ -69,6 +73,8 @@ tower-defense/
 ├── css/
 │   └── style.css
 └── js/
+    ├── audio.js   (música y efectos de sonido)
+    ├── title.js   (pantalla de inicio)
     ├── maps.js    (mapas y dibujo del terreno)
     ├── data.js    (torres y enemigos: balance)
     ├── render.js  (dibujo de torres, enemigos y escena)

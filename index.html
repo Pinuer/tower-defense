@@ -24,18 +24,31 @@
       <button id="pause">Pausa</button>
       <button id="restart">Reiniciar</button>
       <button id="mapbtn"></button>
+      <button id="mute">Sonido: sí</button>
     </div>
     <div class="row" id="sel" hidden>
       <button id="up"></button><button id="sell"></button>
     </div>
     <div id="info">Elige una torre y haz clic en un casillero libre para colocarla.</div>
-    <div class="hint">Espacio: iniciar oleada · números: elegir torre · P: pausa</div>
+    <div class="hint">Espacio: iniciar oleada · números: elegir torre · P: pausa · M: sonido</div>
   </aside>
 </div>
 </main>
+<div id="title" role="dialog" aria-label="Pantalla de inicio" tabindex="0">
+  <canvas id="tcv" width="640" height="480"></canvas>
+  <div class="tbox">
+    <div class="tsub">Defiende el camino</div>
+    <div class="tlogo"><span>TOWER</span><span>DEFENSE</span></div>
+    <button id="play" class="tplay">&#9654; Jugar</button>
+    <div class="tblink" id="tblink">Presiona para empezar</div>
+    <div class="tmeta" id="tmeta"></div>
+  </div>
+</div>
+<script src="js/audio.js"></script>
 <script src="js/maps.js"></script>
 <script src="js/data.js"></script>
 <script src="js/render.js"></script>
 <script src="js/game.js"></script>
+<script src="js/title.js"></script>
 </body>
 </html>

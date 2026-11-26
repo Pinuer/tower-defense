@@ -159,6 +159,7 @@ function startWave() {
   if (S.active || S.over) return;
   S.wave++;
   S.active = true;
+  SFX.wave(S.wave === MAXW);
   S.bt = 0;
   const n = 6 + S.wave * 2;
   for (let i = 0; i < n; i++) {
@@ -214,6 +215,7 @@ function upgrade(i) {
     c = t && upCost(t);
   if (S.paused || !t || t.lv >= 3 || S.gold < c) return;
   S.gold -= c;
+  SFX.upgrade();
   t.spent += c;
   if (t.lv === 2) {
     const p = TYPES[t.k].paths[i];
@@ -242,6 +244,7 @@ $("sell").onclick = () => {
   const t = S.sel;
   if (!t || S.paused) return;
   S.gold += Math.floor(t.spent * 0.7);
+  SFX.sell();
   S.towers.splice(S.towers.indexOf(t), 1);
   S.sel = null;
   ui();
@@ -300,6 +303,7 @@ C.addEventListener("click", (e) => {
     S.mx = S.my = -1;
   }
   S.gold -= d.cost;
+  SFX.build();
   S.towers.push({
     k: S.pick,
     cx,
@@ -330,6 +334,7 @@ function hit(e, dmg, slow, burn, poison) {
   }
   if (e.hp <= 0) {
     e.dead = true;
+    SFX.kill(e.kind === "boss");
     S.gold += e.rw;
     const q = pos(e.d, e.rt);
     if (e.kind === "magma" || e.ab === "rage")
@@ -430,6 +435,7 @@ function update(dt) {
       const kn = S.queue.shift(),
         en = mk(kn, 0, S.rr++ % ROUTES.length);
       if (kn === "boss") {
+        SFX.wave(true);
         const B = MAPS[MI].boss;
         Object.assign(en, {
           ab: B.ab,
@@ -492,9 +498,11 @@ function update(dt) {
       e.dead = true;
       S.lives = Math.max(0, S.lives - (e.kind === "boss" ? 5 : 1));
       S.hurt = 0.35;
+      SFX.hurt();
       ui();
       if (S.lives <= 0) {
         S.over = "lose";
+        SFX.lose();
       }
     }
   }
@@ -512,6 +520,7 @@ function update(dt) {
       const q = pos(best.d, best.rt);
       t.ang = Math.atan2(q[1] - t.y, q[0] - t.x);
       t.cd = TYPES[t.k].rate * (t.rm || 1);
+      SFX.shoot(t.k);
       if (TYPES[t.k].chain) chain(t, best);
       else S.shots.push({ x: t.x, y: t.y, tg: best, t, a: t.ang });
     }
@@ -554,6 +563,7 @@ function update(dt) {
     S.gold += 15 + S.wave * 2;
     if (S.wave >= MAXW) {
       S.over = "win";
+      SFX.win();
       unlock(MI + 2);
     }
     ui();
@@ -565,11 +575,12 @@ MAP.width = W * T;
 MAP.height = H * T;
 drawMap();
 
+let TITLE = true;
 let last = performance.now();
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  if (!S.paused) for (let i = 0; i < S.speed; i++) update(dt);
+  if (!S.paused && !TITLE) for (let i = 0; i < S.speed; i++) update(dt);
   draw();
   const lbl =
     S.over || S.active
@@ -588,6 +599,7 @@ function togglePause() {
 if ($("pause")) $("pause").onclick = togglePause;
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (TITLE) return;
   const k = e.key.toLowerCase();
   if (k === " ") {
     e.preventDefault();
