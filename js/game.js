@@ -1,7 +1,8 @@
 /* Lógica del juego: estado, oleadas, torres, daño y entrada del usuario. */
 const C = document.getElementById("c"),
   X = C.getContext("2d");
-const T = 40,
+const SC = 2, /* resolución interna: el canvas dibuja a 2x para verse nítido al agrandarlo */
+  T = 40,
   W = 16,
   H = 12,
   MAXW = 20,
@@ -9,6 +10,7 @@ const T = 40,
 let MI = 0,
   WP,
   ROUTES,
+  GR = 1,
   path;
 function setMap(i) {
   MI = i;
@@ -25,6 +27,7 @@ function setMap(i) {
     return { pts, sg, total };
   });
   WP = ROUTES[0].pts;
+  GR = ROUTES.length;
   path = new Set();
   for (const R of ROUTES)
     for (let j = 1; j < R.pts.length; j++) {
@@ -38,7 +41,25 @@ function setMap(i) {
             Math.floor((a[1] + ((b[1] - a[1]) * k) / n) / T),
         );
     }
+  /* Rutas aéreas: una línea recta de inicio a fin por cada camino (índices GR..) */
+  for (let i = 0; i < GR; i++) {
+    const p = ROUTES[i].pts,
+      a = p[0],
+      b = p[p.length - 1],
+      l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    ROUTES.push({ pts: [a, b], sg: [l], total: l, air: 1 });
+  }
 }
+const DIFS = [
+  { n: "Fácil", lives: 30, gold: 1.5 },
+  { n: "Normal", lives: 20, gold: 1 },
+  { n: "Difícil", lives: 12, gold: 0.75 },
+];
+let DI = 1;
+try {
+  DI = Math.min(2, Math.max(0, +localStorage.getItem("td_diff") || 1));
+  if (localStorage.getItem("td_diff") === "0") DI = 0;
+} catch (e) {}
 let unlocked = 1;
 try {
   unlocked = Math.min(MAPS.length, Math.max(1, +localStorage.getItem("td_unlocked") || 1));
@@ -72,8 +93,8 @@ function reset() {
     fx: [],
     pt: [],
     cd: WAIT,
-    gold: MAPS[MI].gold,
-    lives: 20,
+    gold: Math.round(MAPS[MI].gold * DIFS[DI].gold),
+    lives: DIFS[DI].lives,
     wave: 0,
     towers: [],
     enemies: [],
@@ -96,6 +117,7 @@ function reset() {
     my: -1,
   };
   $("speed").textContent = "Velocidad x1";
+  $("diff").textContent = "Dificultad: " + DIFS[DI].n;
   if ($("pause")) $("pause").textContent = "Pausa";
   $("mapbtn").textContent = "Nivel " + (MI + 1) + ": " + MAPS[MI].name;
   ui();
@@ -139,7 +161,52 @@ function ui() {
       up2.disabled = S.gold < upCost(t);
     }
     $("sell").textContent = "Vender (+" + Math.floor(t.spent * 0.7) + ")";
+    $("pri").textContent = "Objetivo: " + PRI[t.pri || 0];
   }
+  $("next").textContent = nextPreview();
+}
+const PRI = ["Primero", "Más fuerte", "Más débil", "Más cercano"];
+const KN = {
+  normal: ["soldado", "soldados"],
+  fast: ["rápido", "rápidos"],
+  tank: ["acorazado", "acorazados"],
+  healer: ["curandero", "curanderos"],
+  yeti: ["yeti", "yetis"],
+  scorpion: ["escorpión", "escorpiones"],
+  magma: ["magma", "magmas"],
+  cieno: ["cieno", "cienos"],
+  bat: ["murciélago", "murciélagos"],
+  ghost: ["fantasma", "fantasmas"],
+  boss: ["jefe", "jefes"],
+};
+function buildQueue(w) {
+  const q = [],
+    n = 6 + w * 2;
+  for (let i = 0; i < n; i++) {
+    let k = "normal";
+    if (w % 5 === 0 && i % 4 === 3) k = "tank";
+    else if (w % 3 === 0 && i % 2 === 1) k = "fast";
+    else if (w >= 3 && i % 5 === 2 && MAPS[MI].foe) k = MAPS[MI].foe;
+    else if (w >= 5 && i % 6 === 1) k = "bat";
+    else if (w >= 7 && i % 7 === 4) k = "ghost";
+    q.push(k);
+  }
+  if (w === MAXW) q.push("boss");
+  return q;
+}
+function nextPreview() {
+  const w = S.wave + 1;
+  if (S.over || w > MAXW) return "";
+  const c = {};
+  for (const k of buildQueue(w)) c[k] = (c[k] || 0) + 1;
+  return (
+    "Oleada " +
+    w +
+    ": " +
+    Object.keys(c)
+      .map((k) => c[k] + " " + KN[k][c[k] === 1 ? 0 : 1])
+      .join(", ")
+  );
 }
 const upCost = (t) => Math.round(TYPES[t.k].cost * 0.8 * t.lv);
 const shop = $("shop");
@@ -148,6 +215,7 @@ for (const k in TYPES) {
   b.dataset.k = k;
   b.style.setProperty("--c", TYPES[k].col);
   b.textContent = TYPES[k].name + " (" + TYPES[k].cost + ")";
+  if (TYPES[k].gnd) b.title = "Solo ataca enemigos terrestres";
   b.onclick = () => {
     S.pick = k;
     S.sel = null;
@@ -161,19 +229,28 @@ function startWave() {
   S.active = true;
   SFX.wave(S.wave === MAXW);
   S.bt = 0;
-  const n = 6 + S.wave * 2;
-  for (let i = 0; i < n; i++) {
-    let k = "normal";
-    if (S.wave % 5 === 0 && i % 4 === 3) k = "tank";
-    else if (S.wave % 3 === 0 && i % 2 === 1) k = "fast";
-    else if (S.wave >= 3 && i % 5 === 2 && MAPS[MI].foe) k = MAPS[MI].foe;
-    S.queue.push(k);
-  }
-  if (S.wave === MAXW) S.queue.push("boss");
+  S.queue.push(...buildQueue(S.wave));
+  S.kinds = new Set(S.queue);
   S.spawnT = 0;
   ui();
 }
 $("start").onclick = startWave;
+$("pri").onclick = () => {
+  if (S.sel) {
+    S.sel.pri = ((S.sel.pri || 0) + 1) % PRI.length;
+    ui();
+  }
+};
+$("diff").onclick = () => {
+  const inGame = S.wave > 0 && !S.over;
+  if (inGame && !confirm("Hay una partida en curso. ¿Cambiar la dificultad y reiniciar?")) return;
+  DI = (DI + 1) % DIFS.length;
+  try {
+    localStorage.setItem("td_diff", DI);
+  } catch (e) {}
+  reset();
+  $("info").textContent = "Dificultad " + DIFS[DI].n + ": " + DIFS[DI].lives + " vidas.";
+};
 $("mapbtn").onclick = () => {
   const inGame = S.wave > 0 && !S.over;
   if (inGame && !confirm("Hay una partida en curso. ¿Cambiar de nivel y perder el progreso?"))
@@ -190,7 +267,7 @@ $("mapbtn").onclick = () => {
     MAPS[MI].name +
     "." +
     (nt ? " Torre nueva: " + nt.name + "." : "") +
-    (ROUTES.length > 1 ? " Los enemigos llegan por dos caminos." : "");
+    (GR > 1 ? " Los enemigos llegan por dos caminos." : "");
 };
 $("speed").onclick = () => {
   S.speed = (S.speed % 3) + 1;
@@ -251,7 +328,7 @@ $("sell").onclick = () => {
 };
 function cell(e) {
   const r = C.getBoundingClientRect(),
-    s = C.width / r.width;
+    s = C.width / SC / r.width;
   return [(e.clientX - r.left) * s, (e.clientY - r.top) * s];
 }
 let tapCell = null;
@@ -314,6 +391,7 @@ C.addEventListener("click", (e) => {
     dmg: d.dmg,
     cd: 0,
     lv: 1,
+    pri: 0,
     spent: d.cost,
     born: performance.now() / 1000,
   });
@@ -378,7 +456,7 @@ function chain(t, first) {
     let nxt = null,
       nd = 75;
     for (const e of S.enemies) {
-      if (e.dead || done.has(e)) continue;
+      if (e.dead || e.hid || done.has(e)) continue;
       const q = pos(e.d, e.rt),
         dd = Math.hypot(q[0] - p[0], q[1] - p[1]);
       if (dd < nd) {
@@ -404,6 +482,9 @@ function mk(kn, d, rt) {
     r: k.r,
     slow: 0,
     rw: Math.floor(6 + S.wave / 2),
+    fly: k.fly,
+    ghost: k.ghost,
+    ht: Math.random() * 4,
   };
 }
 function update(dt) {
@@ -433,7 +514,8 @@ function update(dt) {
     S.spawnT -= dt;
     if (S.spawnT <= 0) {
       const kn = S.queue.shift(),
-        en = mk(kn, 0, S.rr++ % ROUTES.length);
+        en = mk(kn, 0, S.rr++ % GR);
+      if (en.fly) en.rt += GR;
       if (kn === "boss") {
         SFX.wave(true);
         const B = MAPS[MI].boss;
@@ -457,6 +539,10 @@ function update(dt) {
       for (const o of S.enemies)
         if (o !== e && !o.dead && (o.rt || 0) === (e.rt || 0) && Math.abs(o.d - e.d) < 60)
           o.hp = Math.min(o.max, o.hp + o.max * 0.05 * dt);
+    if (e.ghost) {
+      e.ht += dt;
+      e.hid = e.ht % 4 > 2.5;
+    }
     e.slow = Math.max(0, e.slow - dt);
     if (e.psn > 0) {
       e.psn -= dt;
@@ -510,11 +596,18 @@ function update(dt) {
     t.cd -= dt;
     if (t.fz > 0) t.fz -= dt;
     if (t.cd > 0) continue;
-    let best = null;
+    let best = null,
+      bs = -Infinity;
     for (const e of S.enemies) {
-      if (e.dead) continue;
-      const p = pos(e.d, e.rt);
-      if (Math.hypot(p[0] - t.x, p[1] - t.y) <= t.range && (!best || pg(e) > pg(best))) best = e;
+      if (e.dead || e.hid || (e.fly && TYPES[t.k].gnd)) continue;
+      const p = pos(e.d, e.rt),
+        dd = Math.hypot(p[0] - t.x, p[1] - t.y);
+      if (dd > t.range) continue;
+      const sc = t.pri === 1 ? e.hp : t.pri === 2 ? -e.hp : t.pri === 3 ? -dd : pg(e);
+      if (sc > bs) {
+        bs = sc;
+        best = e;
+      }
     }
     if (best) {
       const q = pos(best.d, best.rt);
@@ -540,6 +633,7 @@ function update(dt) {
       if (d.splash) {
         S.rings.push({ x: p[0], y: p[1], r: d.splash + (s.t.sx || 0), t: 0 });
         for (const e of S.enemies) {
+          if (e.fly || e.hid) continue;
           const q = pos(e.d, e.rt);
           if (Math.hypot(q[0] - p[0], q[1] - p[1]) <= d.splash + (s.t.sx || 0)) hit(e, s.t.dmg);
         }
@@ -571,8 +665,8 @@ function update(dt) {
 }
 /* Mapa (se dibuja una sola vez)  */
 const MAP = document.createElement("canvas");
-MAP.width = W * T;
-MAP.height = H * T;
+MAP.width = W * T * SC;
+MAP.height = H * T * SC;
 drawMap();
 
 let TITLE = true;

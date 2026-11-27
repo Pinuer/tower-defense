@@ -514,6 +514,56 @@ function drawEnemy(e, t0) {
       dot(r * 0.55, s * r * 0.35, 3.2, "#fff");
       dot(r * 0.62, s * r * 0.35, 1.8, "#d9322a");
     }
+  } else if (k === "bat") {
+    X.translate(0, -14);
+    const fl = Math.sin(t0 * 16 + e.d * 0.1);
+    for (const s of [-1, 1])
+      poly(
+        [
+          [r * 0.2, s * r * 0.3],
+          [-r * 0.4, s * (r * 1.9 + fl * 4)],
+          [-r * 1.3, s * (r * 1.3 + fl * 3)],
+          [-r * 0.9, s * r * 0.4],
+        ],
+        dk,
+      );
+    disc();
+    poly(
+      [
+        [r * 0.2, -r * 0.8],
+        [r * 0.5, -r * 1.3],
+        [r * 0.7, -r * 0.6],
+      ],
+      dk,
+    );
+    poly(
+      [
+        [r * 0.2, r * 0.8],
+        [r * 0.5, r * 1.3],
+        [r * 0.7, r * 0.6],
+      ],
+      dk,
+    );
+    for (const s of [-1, 1]) dot(r * 0.5, s * r * 0.3, 1.8, "#ff6a5a");
+  } else if (k === "ghost") {
+    X.globalAlpha = e.hid ? 0.18 : 0.9;
+    const w = Math.sin(t0 * 6 + e.d * 0.1) * 2;
+    poly(
+      [
+        [0, -r],
+        [-r * 1.2, -r * 0.6],
+        [-r * 1.7, -r * 0.3 + w],
+        [-r * 1.2, 0],
+        [-r * 1.7, r * 0.3 - w],
+        [-r * 1.2, r * 0.6],
+        [0, r],
+      ],
+      dk,
+    );
+    disc();
+    for (const s of [-1, 1]) {
+      dot(r * 0.4, s * r * 0.35, 2.2, OUT);
+    }
   } else {
     feet();
     arm(
@@ -532,22 +582,25 @@ function drawEnemy(e, t0) {
     rect(-r * 0.95, -2, r * 0.5, 4, RED);
     eyes(r * 0.62, r * 0.36, r * 0.24);
   }
-  if (k !== "tank" && k !== "ember") {
+  X.globalAlpha = 1;
+  if (k !== "tank" && k !== "ember" && k !== "ghost") {
     X.rotate(-an);
     dot(-r * 0.35, -r * 0.4, r * 0.2, "rgba(255,255,255,.3)");
   }
   X.restore();
-  if (e.hp < e.max) {
+  if (e.hp < e.max && !e.hid) {
+    const by = y - (e.fly ? 14 : 0) - r;
     X.fillStyle = OUT;
-    X.fillRect(x - 13, y - r - 11, 26, 5);
+    X.fillRect(x - 13, by - 11, 26, 5);
     X.fillStyle = e.hp / e.max > 0.4 ? "#6fcf7a" : "#e0b84f";
-    X.fillRect(x - 12, y - r - 10, 24 * Math.max(0, e.hp / e.max), 3);
+    X.fillRect(x - 12, by - 10, 24 * Math.max(0, e.hp / e.max), 3);
   }
 }
 
 /* Dibujo */
 function draw() {
-  X.drawImage(MAP, 0, 0);
+  X.setTransform(SC, 0, 0, SC, 0, 0);
+  X.drawImage(MAP, 0, 0, W * T, H * T);
   const t0 = performance.now() / 1000;
   const hx = Math.floor(S.mx / T),
     hy = Math.floor(S.my / T);
@@ -582,7 +635,7 @@ function draw() {
   for (const e of S.enemies) drawEnemy(e, t0);
   const bs = S.enemies.find((e) => e.kind === "boss");
   if (bs) {
-    const bx = C.width / 2 - 150;
+    const bx = (W * T) / 2 - 150;
     X.fillStyle = OUT;
     X.fillRect(bx - 2, 10, 304, 20);
     X.fillStyle = "#d9674f";
@@ -590,7 +643,7 @@ function draw() {
     X.fillStyle = "#fff";
     X.font = "bold 12px sans-serif";
     X.textAlign = "center";
-    X.fillText(bs.name, C.width / 2, 24);
+    X.fillText(bs.name, (W * T) / 2, 24);
   }
   for (const s of S.shots) {
     X.fillStyle = TYPES[s.t.k].col;
@@ -649,7 +702,7 @@ function draw() {
   X.globalAlpha = 1;
   if (S.hurt > 0) {
     X.fillStyle = "rgba(217,103,79," + S.hurt * 0.7 + ")";
-    X.fillRect(0, 0, C.width, C.height);
+    X.fillRect(0, 0, (W * T), (H * T));
   }
   if (S.bt < 1.8) {
     const a = Math.min(1, S.bt / 0.3, (1.8 - S.bt) / 0.5),
@@ -669,35 +722,39 @@ function draw() {
     X.lineWidth = 5;
     X.strokeStyle = "#10191a";
     X.font = "bold 38px sans-serif";
-    X.strokeText("Oleada " + S.wave, C.width / 2, 56);
+    X.strokeText("Oleada " + S.wave, (W * T) / 2, 56);
     X.fillStyle = "#e0b84f";
-    X.fillText("Oleada " + S.wave, C.width / 2, 56);
-    if (sub) {
-      X.font = "italic 17px sans-serif";
-      X.lineWidth = 4;
-      X.strokeText(sub, C.width / 2, 82);
+    X.fillText("Oleada " + S.wave, (W * T) / 2, 56);
+    const ex = [];
+    if (S.kinds && S.kinds.has("bat")) ex.push("Voladores: cañón y mortero no les pegan");
+    if (S.kinds && S.kinds.has("ghost")) ex.push("Fantasmas: a ratos no se pueden apuntar");
+    if (sub) ex.unshift(sub);
+    X.font = "italic 17px sans-serif";
+    X.lineWidth = 4;
+    ex.forEach((txt, i) => {
+      X.strokeText(txt, (W * T) / 2, 82 + i * 22);
       X.fillStyle = "#e8e2cf";
-      X.fillText(sub, C.width / 2, 82);
-    }
+      X.fillText(txt, (W * T) / 2, 82 + i * 22);
+    });
     X.globalAlpha = 1;
   }
   if (S.paused && !S.over) {
     X.fillStyle = "rgba(16,25,26,.6)";
-    X.fillRect(0, 0, C.width, C.height);
+    X.fillRect(0, 0, (W * T), (H * T));
     X.fillStyle = "#e8e2cf";
     X.font = "bold 36px sans-serif";
     X.textAlign = "center";
-    X.fillText("Pausa", C.width / 2, C.height / 2);
+    X.fillText("Pausa", (W * T) / 2, (H * T) / 2);
     X.font = "16px sans-serif";
-    X.fillText("Pulsa P para continuar", C.width / 2, C.height / 2 + 30);
+    X.fillText("Pulsa P para continuar", (W * T) / 2, (H * T) / 2 + 30);
   }
   if (S.over) {
     X.fillStyle = "rgba(16,25,26,.8)";
-    X.fillRect(0, 0, C.width, C.height);
+    X.fillRect(0, 0, (W * T), (H * T));
     X.fillStyle = S.over === "win" ? "#e0b84f" : "#d9674f";
     X.font = "bold 36px sans-serif";
     X.textAlign = "center";
-    X.fillText(S.over === "win" ? "¡Nivel superado!" : "Derrota", C.width / 2, C.height / 2);
+    X.fillText(S.over === "win" ? "¡Nivel superado!" : "Derrota", (W * T) / 2, (H * T) / 2);
     X.fillStyle = "#e8e2cf";
     X.font = "16px sans-serif";
     X.fillText(
@@ -706,8 +763,8 @@ function draw() {
           ? 'Pulsa "Siguiente nivel" para continuar'
           : "¡Completaste todos los niveles!"
         : "Pulsa Reiniciar para reintentar",
-      C.width / 2,
-      C.height / 2 + 30,
+      (W * T) / 2,
+      (H * T) / 2 + 30,
     );
   }
 }

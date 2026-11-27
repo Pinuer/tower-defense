@@ -23,6 +23,7 @@ const TYPES = {
     rate: 1.3,
     dmg: 30,
     splash: 45,
+    gnd: 1,
     col: "#d9674f",
   },
   frost: {
@@ -91,6 +92,7 @@ const TYPES = {
     dmg: 55,
     splash: 55,
     sp: 200,
+    gnd: 1,
     col: "#9aa3b5",
     lvl: 4,
   },
@@ -112,5 +114,7 @@ const KINDS = {
   },
   magma: { sp: 36, hp: 2.2, col: "#e8532a", r: 11, lbl: "magma (se divide al morir)" },
   cieno: { sp: 42, hp: 2, col: "#7fa05a", r: 10, noPoison: 1, lbl: "cienos (inmunes al veneno)" },
+  bat: { sp: 72, hp: 0.7, col: "#8a6fb0", r: 8, fly: 1, lbl: "murciélagos (vuelan en línea recta)" },
+  ghost: { sp: 42, hp: 1.5, col: "#b8c4d8", r: 9, ghost: 1, lbl: "fantasmas (a ratos son intocables)" },
   ember: { sp: 75, hp: 0.35, col: "#ffb347", r: 6 },
 };

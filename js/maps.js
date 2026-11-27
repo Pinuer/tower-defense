@@ -107,8 +107,8 @@ const MAPS = [
     name: "Pantano",
     foe: "cieno",
     boss: { name: "Rey del pantano", ab: "regen", col: "#4f7a3a", noPoison: 1 },
-    gold: 170,
-    hpm: 1.25,
+    gold: 200,
+    hpm: 1.1,
     routes: [
       [
         [0, 5],
@@ -143,6 +143,7 @@ const MAPS = [
 function drawMap() {
   const m = MAPS[MI],
     g = MAP.getContext("2d");
+  g.setTransform(SC, 0, 0, SC, 0, 0);
   let s = 7 + MI * 13;
   const R = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const OUTL = "#1c211d",

@@ -15,9 +15,15 @@
   <span class="chip" title="Oleada">Oleada <b id="wave"></b>/20</span>
 </div>
 <div class="game">
-  <canvas id="c" width="640" height="480"></canvas>
-  <aside class="side">
+  <aside class="side left">
     <div class="row" id="shop"></div>
+    <div class="row" id="sel" hidden>
+      <button id="up"></button><button id="sell"></button>
+      <button id="pri"></button>
+    </div>
+  </aside>
+  <canvas id="c" width="1280" height="960"></canvas>
+  <aside class="side">
     <div class="row">
       <button class="go" id="start">Iniciar oleada</button>
       <button id="speed">Velocidad x1</button>
@@ -25,10 +31,9 @@
       <button id="restart">Reiniciar</button>
       <button id="mapbtn"></button>
       <button id="mute">Sonido: sí</button>
+      <button id="diff">Dificultad: Normal</button>
     </div>
-    <div class="row" id="sel" hidden>
-      <button id="up"></button><button id="sell"></button>
-    </div>
+    <div id="next"></div>
     <div id="info">Elige una torre y haz clic en un casillero libre para colocarla.</div>
     <div class="hint">Espacio: iniciar oleada · números: elegir torre · P: pausa · M: sonido</div>
   </aside>

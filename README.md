@@ -10,6 +10,9 @@ Juego de torres hecho con HTML, Canvas y JavaScript, sin dependencias.
 - Haz clic en una torre ya colocada para mejorarla (hasta nivel 3) o venderla.
 - Pulsa **Iniciar oleada**; si no lo haces, la siguiente oleada empieza sola a los 20 segundos (el botón muestra la cuenta regresiva). Sobrevive 20 oleadas sin quedarte sin vidas.
 - Son 5 niveles (Valle, Nieve, Desierto, Volcán y Pantano). El Pantano tiene dos caminos que se bifurcan: los enemigos se reparten entre ambos y hay que defender los dos. Al superar uno se desbloquea el siguiente; el progreso se guarda en el navegador.
+- El botón **Objetivo** del panel de torre elige a quién apunta: primero, más fuerte, más débil o más cercano.
+- El botón **Dificultad** alterna Fácil (30 vidas, +50% oro), Normal (20 vidas) y Difícil (12 vidas, −25% oro) y reinicia la partida. Se guarda en el navegador.
+- Bajo los botones se ve la composición de la próxima oleada.
 - Mientras el juego está en pausa no se puede construir, mejorar ni vender.
 - El botón de nivel pide confirmación si hay una partida en curso.
 - El botón de velocidad alterna entre x1, x2 y x3.
@@ -44,6 +47,10 @@ Además de los básicos (soldado, rápido y acorazado), cada nivel suma un enemi
 | 3     | Escorpión | Inmune a la quema              |
 | 4     | Magma     | Se divide en dos al morir      |
 | 5     | Cieno     | Inmune al veneno               |
+
+## Voladores y fantasmas
+
+Desde la oleada 5 aparecen **murciélagos**: vuelan en línea recta ignorando el camino (llegan antes) y el Cañón y el Mortero no pueden apuntarles. Desde la oleada 7 aparecen **fantasmas**: cada pocos segundos se vuelven invisibles un instante y las torres no pueden apuntarles ni la explosión los alcanza.
 
 ## Jefes
 

@@ -12,7 +12,7 @@
 body{
     margin:0;
     min-height:100vh;
-    background:var(--bg);
+    background:radial-gradient(ellipse at 50% 0%,#26301f 0%,var(--bg) 60%) fixed;
     color:var(--ink);
     font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;
     display:flex;
@@ -22,14 +22,18 @@ body{
 
 main{
     width:100%;
-    max-width:960px
+    max-width:1640px
 }
 
 h1{
-    font-size:26px;
+    font-size:28px;
     margin:0 0 12px;
     text-align:center;
-    font-weight:600
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    text-shadow:0 2px 0 #5a4416,0 4px 14px rgba(0,0,0,.5)
 }
 
 .bar{
@@ -43,10 +47,15 @@ h1{
 .chip{
     background:var(--panel);
     border:1px solid var(--line);
-    border-radius:4px;
-    padding:4px 12px;
-    color:var(--mute)
+    border-radius:999px;
+    padding:5px 16px;
+    color:var(--mute);
+    box-shadow:0 2px 6px rgba(0,0,0,.25)
 }
+
+.chip:nth-child(1) b{color:#f0c85a}
+.chip:nth-child(2) b{color:#ee7f70}
+.chip:nth-child(3) b{color:#8fd49a}
 
 .chip b{
     color:var(--ink);
@@ -55,23 +64,27 @@ h1{
 
 .game{
     display:flex;
-    gap:16px;
-    align-items:flex-start
+    gap:20px;
+    align-items:flex-start;
+    justify-content:center
 }
 
 canvas{
     flex:1 1 0;
     min-width:0;
     width:100%;
+    max-width:calc((100vh - 150px) * 4 / 3);
+    aspect-ratio:4/3;
     height:auto;
     display:block;
     border:4px solid #0e110e;
-    border-radius:4px;
+    border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 1px var(--line);
     touch-action:manipulation
 }
 
 .side{
-    flex:0 0 250px;
+    flex:0 0 236px;
     display:flex;
     flex-direction:column;
     gap:12px
@@ -81,10 +94,11 @@ canvas{
     display:flex;
     flex-wrap:wrap;
     gap:8px;
-    padding:10px;
+    padding:12px;
     background:var(--panel);
     border:1px solid var(--line);
-    border-radius:4px
+    border-radius:8px;
+    box-shadow:0 4px 14px rgba(0,0,0,.3)
 }
 
 button{
@@ -92,10 +106,13 @@ button{
     background:var(--bg);
     color:var(--ink);
     border:1px solid var(--line);
-    border-radius:4px;
+    border-radius:6px;
     padding:8px 12px;
-    cursor:pointer
+    cursor:pointer;
+    transition:border-color .12s,background .12s,transform .08s
 }
+
+button:active:not(:disabled){transform:translateY(1px)}
 
 button:hover:not(:disabled){
     border-color:var(--accent)
@@ -149,11 +166,25 @@ button.go{
 #restart,
 #mapbtn,
 #mute,
+#diff,
+#pri,
 #up,
 #up2,
 #sell{
     flex:1
 }
+
+#next{
+    color:var(--ink);
+    font-size:14px;
+    padding:8px 12px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--accent);
+    border-radius:6px
+}
+
+#next:empty{display:none}
 
 #info{
     color:var(--mute);
@@ -169,8 +200,11 @@ button.go{
 
 @media (max-width:900px){
     .game{
-        flex-direction:column
+        flex-direction:column;
+        align-items:stretch
     }
+
+    canvas{max-width:none;order:-1}
 
     .side{
         flex:none;
@@ -300,3 +334,11 @@ button.go{
 @media (prefers-reduced-motion:reduce){
     .tblink{animation:none}
 }
+
+/* Controles en cuadrícula de 2 columnas */
+.row:has(#start){
+    display:grid;
+    grid-template-columns:1fr 1fr
+}
+
+.row:has(#start) .go{grid-column:1 / -1}
